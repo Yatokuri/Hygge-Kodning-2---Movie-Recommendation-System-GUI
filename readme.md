@@ -1,5 +1,16 @@
-# Movie Recommendation Example
-This is a relatively simple example of a recommendation system for the MRS.
+# Private Movie Collection
+
+## Description
+
+Compulsory 1: winter 2024 (2. semester)
+
+## Authors
+
+Contributors names and contact info
+
+Daniel
+Thomas
+Naylin
 
 ## Caching data
 It caches the entire database (of flat files) into a cache in the data access layer, consisting of HashMaps of Users and Movies and lastly it
