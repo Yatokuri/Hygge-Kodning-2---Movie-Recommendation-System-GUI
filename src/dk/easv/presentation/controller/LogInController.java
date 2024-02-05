@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -32,15 +33,24 @@ public class LogInController implements Initializable {
         model.loginUserFromUsername(userId.getText());
         if(model.getObsLoggedInUser()!=null){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/easv/presentation/view/App.fxml"));
+            //Main
+            //FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/easv/presentation/view/App.fxml"));
+            //Test D
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/easv/presentation/view/NetfliksD.fxml"));
+            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Movie Recommendation System 0.01 Beta");
-            stage.show();
-            AppController controller = loader.getController();
+            // Set the scene in the existing stage
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Movie Recommendation System 0.01 Beta");
 
-            controller.setModel(model);
+            //Main
+            //AppController controller = loader.getController();
+            //controller.setModel(model);
+
+            //Test D
+            NetfliksD controller = loader.getController();
+            controller.setPrimaryStage(currentStage);
+            controller.startupNetfliks();
 
 
         } catch (IOException e) {
