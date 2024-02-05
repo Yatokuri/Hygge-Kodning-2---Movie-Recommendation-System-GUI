@@ -5,10 +5,12 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -18,7 +20,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class NetfliksD implements Initializable {
-    private static final int ROWS = 3;
+    private static final int ROWS = 3*2;
     private static final int COLUMNS = 7;
     private static final int TOTAL_IMAGES = 20;
 
@@ -43,21 +45,27 @@ public class NetfliksD implements Initializable {
     }
 
     public void startupNetfliks() {
-        GridPane gridPane = createImageGrid();
-        movieDisplay.getChildren().add(gridPane);
+        createImageGrid();
     }
 
-    private GridPane createImageGrid() {
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-
+    private void createImageGrid() {
         for (int row = 0; row < ROWS; row++) {
-            updateRow(gridPane, row);
+            if (row % 2 != 0) { //Odd numbers 1,3,5..
+                GridPane gridPane = new GridPane();
+                gridPane.setHgap(5);
+                gridPane.setVgap(0);
+                updateRow(gridPane, row);
+                movieDisplay.getChildren().add(gridPane);
+            }
+            else {
+                Label movieTabTitle = new Label("Title who knowsdddddddddddddddddddddddddddddddddddddd ");
+                movieTabTitle.setId("movieTabTitle");
+                movieDisplay.getChildren().add(movieTabTitle);
+            }
         }
-
-        return gridPane;
     }
+
+
 
     private void updateRow(GridPane gridPane, int row) {
         int currentIndex = rowIndices.get(row);
