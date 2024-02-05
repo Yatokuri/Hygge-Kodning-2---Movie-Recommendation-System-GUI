@@ -11,7 +11,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("presentation/view/LogIn.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/view/LogIn.fxml"));
         primaryStage.setTitle("Movie Recommendation System 0.02 Beta");
         primaryStage.getIcons().add(new Image("/Icons/mainIcon.png"));
         //primaryStage.setFullScreen(true);

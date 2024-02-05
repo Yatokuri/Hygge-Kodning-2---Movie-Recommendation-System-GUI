@@ -1,5 +1,6 @@
 package dk.easv.presentation.controller;
 
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -16,14 +18,16 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class NetfliksD implements Initializable {
-    private static final int ROWS = 5;
-    private static final int COLUMNS = 5;
+    private static final int ROWS = 3;
+    private static final int COLUMNS = 7;
     private static final int TOTAL_IMAGES = 20;
 
     private Map<Integer, Integer> rowIndices = new HashMap<>();
     private Map<Integer, Integer> highestRowIndices = new HashMap<>();
     private Stage primaryStage;
     private Scene scene;
+    @FXML
+    private VBox movieDisplay;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -40,8 +44,7 @@ public class NetfliksD implements Initializable {
 
     public void startupNetfliks() {
         GridPane gridPane = createImageGrid();
-        scene = new Scene(gridPane, 800, 600);
-        primaryStage.setScene(scene);
+        movieDisplay.getChildren().add(gridPane);
     }
 
     private GridPane createImageGrid() {
@@ -79,10 +82,12 @@ public class NetfliksD implements Initializable {
         // Create Left Arrow Button
         Button leftArrowButton = new Button("←");
         leftArrowButton.setOnAction(e -> handleLeftArrow(gridPane, row));
+        leftArrowButton.setId("arrowButton");
 
         // Create Right Arrow Button
         Button rightArrowButton = new Button("→");
         rightArrowButton.setOnAction(e -> handleRightArrow(gridPane, row));
+        rightArrowButton.setId("arrowButton");
 
         // Create HBox for the first column
         HBox arrowBoxFirstColumn = new HBox(10, leftArrowButton);

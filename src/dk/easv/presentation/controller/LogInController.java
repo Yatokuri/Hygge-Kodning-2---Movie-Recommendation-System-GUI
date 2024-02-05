@@ -1,6 +1,5 @@
 package dk.easv.presentation.controller;
 
-import dk.easv.entities.User;
 import dk.easv.presentation.model.AppModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,7 +35,7 @@ public class LogInController implements Initializable {
             //Main
             //FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/easv/presentation/view/App.fxml"));
             //Test D
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/easv/presentation/view/NetfliksD.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/NetfliksD.fxml"));
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             Parent root = loader.load();
             // Set the scene in the existing stage

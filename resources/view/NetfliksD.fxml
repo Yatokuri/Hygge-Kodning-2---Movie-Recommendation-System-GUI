@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" stylesheets="@../CSS/Main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.presentation.controller.NetfliksD">
+   <children>
+      <HBox fx:id="navBar" prefHeight="35.0" prefWidth="600.0" stylesheets="@/CSS/Main.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="35.0" fitWidth="140.0">
+               <image>
+                  <Image url="@../Icons/netfliks.png" />
+               </image>
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </ImageView>
+            <HBox prefHeight="45.0" prefWidth="323.0">
+               <children>
+                  <Button mnemonicParsing="false" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="Home" textFill="#a40000">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+                  <Button mnemonicParsing="false" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="My List" textFill="#a40000">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+                  <Button mnemonicParsing="false" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="Donate" textFill="#a40000">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_RIGHT" prefHeight="35.0" prefWidth="254.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <ImageView fitHeight="35.0" fitWidth="35.0">
+                     <image>
+                        <Image url="@../Icons/SearchIcon.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <MenuButton mnemonicParsing="false" prefHeight="45.0" prefWidth="126.0" stylesheets="@/CSS/Main.css" text="Username">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </MenuButton>
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <VBox fx:id="movieDisplay" layoutY="45.0" prefHeight="356.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0" />
+   </children>
+</AnchorPane>
