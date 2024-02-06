@@ -1,5 +1,6 @@
 package dk.easv.presentation.controller;
 
+import dk.easv.entities.User;
 import dk.easv.presentation.model.AppModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,6 +19,8 @@ import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -36,9 +39,32 @@ public class LogInController implements Initializable {
     public void logIn(ActionEvent actionEvent) {
         model.loadUsers();
         model.loginUserFromUsername(userId.getText());
+        String password;
 
-        if(model.getObsLoggedInUser()!=null){
         try {
+            List<String> userLines = Files.readAllLines(Path.of("data/users.txt"));
+            if (model.getObsLoggedInUser()!= null){
+                for (String s: userLines ) {
+                    System.out.println(s);
+                }
+                //String currentUser = userLines.get()
+                //int userId = model.getObsLoggedInUser().getId();
+                //int userIndex = userLines.indexOf();
+                //String currentUser = userLines.get(userIndex);
+
+                //String[] user = currentUser.split(",");
+                //System.out.println(user[2]);
+                //password = user[2];
+                //System.out.println(password);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if(model.getObsLoggedInUser()!=null)
+        {
+            //if (passwordField == password || password == null)
+            try {
             //Main
             //FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/easv/presentation/view/App.fxml"));
             //Test D
@@ -57,8 +83,6 @@ public class LogInController implements Initializable {
             NetfliksD controller = loader.getController();
             controller.setPrimaryStage(currentStage);
             controller.startupNetfliks();
-
-
         } catch (IOException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Could not load App.fxml");
@@ -72,29 +96,17 @@ public class LogInController implements Initializable {
     }
 
     public void signUp(ActionEvent actionEvent) {
-        System.out.println("Sign-Up initiated");
-        try {
-            FileReader fileReader = new FileReader("users.txt");
-            List<String> lines = new ArrayList<>();
-            Scanner sc = new Scanner(fileReader);
-            while (sc.hasNextLine()){
-                lines.add(sc.nextLine());
-            }
-            sc.close();
-            String latestUser = lines.getLast();
-            int newUserId = Integer.parseInt(latestUser.substring(0,latestUser.indexOf(","))) + 1;
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("data/users.txt", true))){
+            List<String> userLines = Files.readAllLines(Path.of("data/users.txt"));
+            int newUserId = Integer.parseInt(userLines.getLast().substring(0,userLines.getLast().indexOf(","))) + 1;
             String newUserName = userId.getText();
             String newUserPassword = passwordField.getText();
-
-            FileWriter myWriter = new FileWriter("users.txt", true);
-            BufferedWriter bufferedWriter = new BufferedWriter(myWriter);
             String newUser = newUserId + "," + newUserName + "," + newUserPassword;
             bufferedWriter.newLine();
             bufferedWriter.write(newUser);
-            System.out.println("New User created" + "\n UserId:" + newUserId +  "\n Username:" + newUserName + "\n Password." + newUserPassword);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
 }

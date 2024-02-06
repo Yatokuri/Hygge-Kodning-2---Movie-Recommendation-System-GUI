@@ -1,0 +1,14 @@
+#anchorPane{
+    -fx-background-color: #8E1A1A;
+}
+.label {
+    -fx-text-fill: white;
+}
+.text-field {
+    -fx-background-color: #2a2323;
+    -fx-text-fill: white;
+}
+.button {
+    -fx-background-color: #2a2323;
+    -fx-text-fill: white;
+}
