@@ -12,3 +12,17 @@
     -fx-background-color: #2a2323;
     -fx-text-fill: white;
 }
+
+#customLoginSignUp {
+    -fx-background-color: #2a2323;
+    -fx-text-fill: white;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+#customLoginSignUp .mfx-ripple-generator {
+    -mfx-ripple-color: #362d2d; /* Ripple color (same as main color) */
+    -fx-opacity: 0.5;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}

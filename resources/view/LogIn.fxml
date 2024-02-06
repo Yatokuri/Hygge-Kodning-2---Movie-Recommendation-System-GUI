@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -36,8 +36,8 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button mnemonicParsing="false" onAction="#logIn" text="login" />
-                  <Button mnemonicParsing="false" onAction="#signUp" text="Sign-Up" GridPane.columnIndex="1" />
+                  <MFXButton id="customLoginSignUp" onAction="#logIn" stylesheets="@../CSS/Login.css" text="login" />
+                  <MFXButton id="customLoginSignUp" onAction="#signUp" stylesheets="@../CSS/Login.css" text="Sign-Up" GridPane.columnIndex="1" />
                </children>
             </GridPane>
             <Label layoutX="104.0" layoutY="45.0" prefHeight="17.0" prefWidth="61.0" text="Username" />
