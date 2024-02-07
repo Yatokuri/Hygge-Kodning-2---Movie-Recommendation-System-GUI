@@ -1,7 +1,7 @@
 package dk.easv.presentation.controller;
 
+import dk.easv.entities.Movie;
 import dk.easv.presentation.model.AppModel;
-import dk.easv.entities.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -30,14 +30,17 @@ public class NetfliksD implements Initializable {
     private ImageView Image;
 
     private final Map<Integer, Integer> rowIndices = new HashMap<>();
+
     private final Map<Integer, Integer> highestRowIndices = new HashMap<>();
-    // HashMap to store ImageViews for reuse
-    private final Map<Integer, ImageView> imageViewMap = new HashMap<>();
 
-    private final Map<Integer, ImageView> imageInMovielist = new HashMap<>();
-    private final Map<Integer, Integer> imageInMovielistCount = new HashMap<>();
 
+    private final Map<Integer, ImageView> imageMovieList = new HashMap<>(); //Here we save all image with a unique key
+    private final Map<Integer, List<Integer>> imageMovieListIdentifier = new HashMap<>(); //Here we save all image key to a specific list of picture (key)
+    private final Map<Integer, Integer> imageInMovieListCount = new HashMap<>(); //Here we save the count of each row of img
+
+    ArrayList<String> movieListTest = new ArrayList<>();
     private ArrayList<String> movieDisplayLabels = new ArrayList<>();
+;
     private Stage primaryStage;
     private Scene scene;
     @FXML
@@ -48,49 +51,89 @@ public class NetfliksD implements Initializable {
     private AppModel appModel;
 
     public NetfliksD(){
-        AppModel appModel = new AppModel();
+
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
     }
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
 
+    public void setModel(AppModel appModel) {
+        this.appModel = appModel;
+    }
+
+    // Method to add a value to the list associated with the given key
+    public void addToMultiKeyMap(int key, int value) {
+        // If the key is not present, create a new list and add it to the map
+        imageMovieListIdentifier.putIfAbsent(key, new ArrayList<>());
+        // Add the value to the list associated with the key
+        imageMovieListIdentifier.get(key).add(value);
+    }
+
+    // Method to get the list of values associated with the given key
+    public List<Integer> getValuesForKey(int key) {
+        // Return the list associated with the key, or an empty list if key not found
+        return imageMovieListIdentifier.getOrDefault(key, new ArrayList<>());
+    }
+
+
     public void startupNetfliks() {
-        AppModel appModel = new AppModel();
-        List<String> selectedMovies = new ArrayList<>();
-        selectedMovies = appModel.getMoviesFromIndex(20);
-        System.out.println("_______________Selected movies________________");
-        for (String movie : selectedMovies) {
-            System.out.println(movie);
-        }
+        appModel.loadUsers();
+        appModel.loadData(appModel.getObsLoggedInUser()); //We load the data from the user log in
 
+        movieListTest.add("obsTopMovieNotSeen");
+        movieListTest.add("obsTopMovieSeen");
+        movieListTest.add("obsTopMovieNotSeen");
 
-     //   AppModel.getObsTopMovieSeen()
+        for (int r = 0; r < ROWS; r++) { //So many rows we want with movie
+            List<Movie> selectedMovies;
+            try {
+                selectedMovies = appModel.getMoviesFromIndex(movieListTest.get(r), 20); // HEAVY TASK
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-        //imageInMovielist.add()
+            int i = 0;
+            for (Movie m : selectedMovies) {
+                String posterPath = m.getPosterPath();
 
-      /*  for (int i = 0; i < ROWS; i++) {
-            movie = AppModel.getObsTopMovieSeen();
-            String posterPath = movie.getPosterPath();
-            if (posterPath != null && !posterPath.isEmpty()) {
-                InputStream stream;
-                try {
-                    stream = new URL(posterPath).openStream();
-                    ImageView image = new ImageView(String.valueOf(stream));
-                    stream.close();
-                    imageInMovielist.put(i, image);
-                    highestRowIndices.put(i, calculateImagesToShow()); // Set to the default value (maximum images in a row)
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                if (posterPath != null && !posterPath.isEmpty()) {
+                    try {
+                        InputStream stream = new URL(posterPath).openStream();
+                        Image image = new Image(stream); // Load the image from the input stream
+                        stream.close();
+
+                        // Check if the Image object is loaded successfully
+                        if (image.isError()) {
+                            System.out.println("Error loading image: " + image.getException().getMessage());
+                        } else {
+                           // System.out.println("Image loaded successfully.");
+                            // Create ImageView
+                            ImageView imageView = new ImageView(image); // Create an ImageView from the Image object
+                            imageView.setPreserveRatio(true); // Preserve the image's aspect ratio
+
+                            // Add the ImageView to the imageMovieList map
+                            imageMovieList.put(imageMovieList.size(), imageView);
+
+                            imageInMovieListCount.put(r, i);
+
+                            addToMultiKeyMap(r, imageMovieList.size());
+
+                            highestRowIndices.put(i, calculateImagesToShow()); // Set to the default value (maximum images in a row)
+                            i++;
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+
             }
+            System.out.println("Row" + r +  "done");
             }
-        */
 
 
 
@@ -101,7 +144,7 @@ public class NetfliksD implements Initializable {
             highestRowIndices.put(i, calculateImagesToShow()); // Set to the default value (maximum images in a row)
         }
         COLUMNS = calculateImagesToShow();
-       // userName.setText();
+        userName.setText(appModel.getObsLoggedInUser().getName());
         setLabelName();
         createImageGrid();
         listenersWindowsSize();
@@ -120,7 +163,6 @@ public class NetfliksD implements Initializable {
     private int calculateImagesToShow() {
         double imagesPerRow = Math.ceil(primaryStage.getWidth() / MOVIE_IMG_WIDTH);
         int imagesPerRowInt = (int) imagesPerRow; // Convert imagesPerRow to integer
-
         // Update highestRowIndices for all rows
         for (int i = 0; i < ROWS; i++) {
             // highestRowIndices.put(i, imagesPerRowInt);
@@ -130,6 +172,7 @@ public class NetfliksD implements Initializable {
 
     private void updateMovieLists() {
         System.out.println("We want see " + calculateImagesToShow() + " picture(s)");
+        COLUMNS = calculateImagesToShow();
     }
 
     Button rightArrowButton, leftArrowButton;
@@ -157,7 +200,7 @@ public class NetfliksD implements Initializable {
             rightArrowButton = new Button("→");
             rightArrowButton.setId("arrowButton");
             HBox.setHgrow(rightArrowButton, Priority.NEVER);
-            updateRow(gridPane, row);
+            updateRow(gridPane, row, 0, COLUMNS);
 
 
 
@@ -203,18 +246,16 @@ public class NetfliksD implements Initializable {
 
 
 
-    private void updateRow(GridPane gridPane, int row) {
-        int currentIndex = rowIndices.get(row);
-        int startIndex = currentIndex * COLUMNS;
-        int totalImagesInRow = highestRowIndices.get(row); // Use the maximum images in a row
-
-        int endIndex = Math.min(startIndex + totalImagesInRow, TOTAL_IMAGES);
-
+    private void updateRow(GridPane gridPane, int row, int startIndex, int numImages) {
+        List<Integer> keys = getValuesForKey(row); // Assuming getValuesForKey(0) returns the list of keys for the current row
+        int endIndex = Math.min(startIndex + numImages, keys.size());
         int colIndex = 0;
+        gridPane.getChildren().clear();
 
         for (int i = startIndex; i < endIndex; i++) {
-            Image image = new Image(getClass().getResourceAsStream("/MovieIMG/" + (i + 1) + ".jpg"));
-            ImageView imageView = new ImageView(image);
+            Integer key = keys.get(i);
+
+            ImageView imageView = imageMovieList.get(key); // Retrieve ImageView using the key
             imageView.setFitWidth(MOVIE_IMG_WIDTH);
             imageView.setFitHeight(MOVIE_IMG_HEIGHT);
             gridPane.add(imageView, colIndex, row);
@@ -234,7 +275,7 @@ public class NetfliksD implements Initializable {
         currentIndex = (currentIndex - 1 + totalImagesInRow) % totalImagesInRow;
 
         rowIndices.put(row, currentIndex);
-        updateRow(gridPane, row);
+        updateRow(gridPane, row, 0, COLUMNS);
     }
 
     private void handleRightArrow(GridPane gridPane, int row) {
@@ -246,6 +287,8 @@ public class NetfliksD implements Initializable {
             currentIndex = 0;
         }
         rowIndices.put(row, currentIndex);
-        updateRow(gridPane, row);
+        updateRow(gridPane, row, 0, COLUMNS);
+
+        //TODO Something there get more picture we can show in next click always a click ahead
     }
 }

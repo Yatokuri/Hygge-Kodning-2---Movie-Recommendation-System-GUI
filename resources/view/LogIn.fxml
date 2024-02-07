@@ -36,7 +36,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <MFXButton id="customLoginSignUp" onAction="#logIn" stylesheets="@../CSS/Login.css" text="login" />
+                  <MFXButton id="customLoginSignUp" onAction="#logIn" stylesheets="@../CSS/Login.css" text="Login" />
                   <MFXButton id="customLoginSignUp" onAction="#signUp" stylesheets="@../CSS/Login.css" text="Sign-Up" GridPane.columnIndex="1" />
                </children>
             </GridPane>

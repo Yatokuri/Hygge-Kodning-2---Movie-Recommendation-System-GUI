@@ -93,6 +93,7 @@ public class LogInController implements Initializable {
             //Test D
             NetfliksD controller = loader.getController();
             controller.setPrimaryStage(currentStage);
+            controller.setModel(model);
             controller.startupNetfliks();
         } catch (IOException e) {
             e.printStackTrace();

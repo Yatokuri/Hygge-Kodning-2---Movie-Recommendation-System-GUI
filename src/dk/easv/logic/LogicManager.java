@@ -1,5 +1,6 @@
 package dk.easv.logic;
 
+import dk.easv.dataaccess.APIAccessManager;
 import dk.easv.dataaccess.DataAccessManager;
 import dk.easv.entities.*;
 import java.util.*;
@@ -7,9 +8,22 @@ import java.util.*;
 public class LogicManager {
 
     DataAccessManager dataMgr = new DataAccessManager();
+    APIAccessManager apiMgr;
+
+    {
+        try {
+            apiMgr = new APIAccessManager();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void reloadAllDataFromStorage(){
         dataMgr.updateCacheFromDisk();
+    }
+
+    public  void giveMoviePosterPath(Movie m) throws Exception {
+        apiMgr.findInformationForMovie(m);
     }
 
     public Collection<User> getAllUsers() {

@@ -55,6 +55,14 @@ public class Movie {
         return ratings.size();
     }
 
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
     @Override
     public String toString() {
         return  title + ", " + year +

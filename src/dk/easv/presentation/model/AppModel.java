@@ -24,18 +24,19 @@ public class AppModel {
 
 
 
-    public List<String> getMoviesFromIndex(int startIndex) {
-        List<String> obsTopMovieNotSeenNew = new ArrayList<>();
-        int endIndex = Math.min(startIndex + 19, obsTopMovieNotSeen.size() - 1);
+    public List<Movie> getMoviesFromIndex(String ObLName, int startIndex) throws Exception {
+        List<Movie> obsTopMovieNotSeenNew = new ArrayList<>();
 
+        // Use reflection to get the ObservableList<Movie> object by its name Test way
+        ObservableList<Movie> listObLName = (ObservableList<Movie>) getClass().getDeclaredField(ObLName).get(this);
+        int endIndex = Math.min(startIndex + 20, listObLName.size()); // Corrected
 
         for (int i = startIndex; i < endIndex; i++) {
-            obsTopMovieNotSeenNew.add(String.valueOf(obsTopMovieSeen.get(i)));
+            logic.giveMoviePosterPath(listObLName.get(i));
+            obsTopMovieNotSeenNew.add(listObLName.get(i));
         }
         return obsTopMovieNotSeenNew;
-        //TOD
     }
-
 
 
     public void loadUsers(){
