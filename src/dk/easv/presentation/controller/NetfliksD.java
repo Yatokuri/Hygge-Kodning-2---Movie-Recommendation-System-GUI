@@ -9,10 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -76,13 +73,11 @@ public class NetfliksD implements Initializable {
         for (int i = 0; i < ROWS; i++) {
             //highestRowIndices.put(i, imagesPerRowInt);
         }
-        return imagesPerRowInt-1;
+        return imagesPerRowInt;
     }
 
     private void updateMovieLists() {
         System.out.println("We want see " + calculateImagesToShow() + "picture(s)");
-
-
     }
 
     Button rightArrowButton, leftArrowButton;
@@ -92,36 +87,27 @@ public class NetfliksD implements Initializable {
             GridPane gridPane = new GridPane();
             gridPane.setHgap(5);
             gridPane.setVgap(0);
-            gridPane.setGridLinesVisible(true);
+            gridPane.setPadding(new Insets(0, 0, 0, 5));
 
             // Create HBox to hold arrow buttons
             HBox arrowButtonsHBox = new HBox();
             arrowButtonsHBox.setAlignment(Pos.CENTER);
-            VBox.setMargin(arrowButtonsHBox, new Insets(-MOVIE_IMG_HEIGHT-+0, 10,0 , 10));
+            VBox.setMargin(arrowButtonsHBox, new Insets(-MOVIE_IMG_HEIGHT-+5, 10,0 , 10));
+
 
 
             // Create Left Arrow Button
             leftArrowButton = new Button("←");
             leftArrowButton.setId("arrowButton");
-            HBox.setHgrow(leftArrowButton, Priority.ALWAYS);
+            HBox.setHgrow(leftArrowButton, Priority.NEVER);
 
             // Create Right Arrow Button
             rightArrowButton = new Button("→");
             rightArrowButton.setId("arrowButton");
-            HBox.setHgrow(rightArrowButton, Priority.ALWAYS);
+            HBox.setHgrow(rightArrowButton, Priority.NEVER);
             updateRow(gridPane, row);
 
-            // Create HBox to hold buttons
-            HBox leftArrowButtonsHBox = new HBox();
-            HBox rightArrowButtonsHBox = new HBox();
-            leftArrowButtonsHBox.getChildren().add(leftArrowButton);
-            leftArrowButtonsHBox.setAlignment(Pos.TOP_LEFT);
-            HBox.setHgrow(leftArrowButtonsHBox, Priority.ALWAYS);
-            rightArrowButtonsHBox.getChildren().add(rightArrowButton);
-            rightArrowButtonsHBox.setAlignment(Pos.TOP_RIGHT);
 
-
-            //TODO The right arrows is not always visible!
 
             // Create Left Arrow Button OnAction
             int finalRow = row;
@@ -133,15 +119,25 @@ public class NetfliksD implements Initializable {
             rightArrowButton.setOnAction(e -> handleRightArrow(gridPane, finalRow1));
             rightArrowButton.setId("arrowButton");
 
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            //TODO The right arrows is not always visible it depend of last grid pane!
+
             // Add arrows buttons to HBox
-            arrowButtonsHBox.getChildren().addAll(leftArrowButtonsHBox, rightArrowButtonsHBox);
-            HBox.setHgrow(arrowButtonsHBox, Priority.ALWAYS);
+            arrowButtonsHBox.getChildren().addAll(leftArrowButton, spacer, rightArrowButton);
+
+
+
 
             VBox GridPaneArrowTitleVBox = new VBox();
             Label movieTabTitle = new Label("Title who knows what it not could be? ");
             movieTabTitle.setId("movieTabTitle");
 
-            VBox.setMargin(gridPane, new Insets(0, 0, 50, 0));
+
+
+            VBox.setMargin(gridPane, new Insets(0, 0, MOVIE_IMG_HEIGHT/2.4, 0));
+            movieDisplayHelper.setSpacing(MOVIE_IMG_HEIGHT/2.4);
+
             GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, arrowButtonsHBox);
             movieDisplayHelper.getChildren().add(GridPaneArrowTitleVBox);
         }
@@ -191,7 +187,6 @@ public class NetfliksD implements Initializable {
         } else {
             currentIndex = 0;
         }
-
         rowIndices.put(row, currentIndex);
         updateRow(gridPane, row);
     }
