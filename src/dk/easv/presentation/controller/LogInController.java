@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.w3c.dom.stylesheets.LinkStyle;
 
@@ -74,6 +75,16 @@ public class LogInController implements Initializable {
             // Set the scene in the existing stage
             currentStage.setScene(new Scene(root));
             currentStage.setTitle("Movie Recommendation System 0.01 Beta");
+            currentStage.setMinWidth(600);
+            currentStage.setMinHeight(320);
+
+            //Fullscreen when opening
+            Screen screen = Screen.getPrimary();
+            currentStage.setX(screen.getVisualBounds().getMinX());
+            currentStage.setY(screen.getVisualBounds().getMinY());
+            currentStage.setWidth(screen.getBounds().getWidth());
+            currentStage.setHeight(screen.getBounds().getHeight());
+            currentStage.setMaximized(true);
 
             //Main
             //AppController controller = loader.getController();

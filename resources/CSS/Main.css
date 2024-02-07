@@ -67,7 +67,7 @@
     -fx-text-fill: white;
 }
 .menu-button {
-    -fx-background-color: none;
+    -fx-background-color: #444444;
     -fx-text-fill: white;
     -fx-border-color: none;
     -fx-border-radius: none;

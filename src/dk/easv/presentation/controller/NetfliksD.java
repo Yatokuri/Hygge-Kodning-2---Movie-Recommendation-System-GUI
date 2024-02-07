@@ -13,23 +13,25 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 public class NetfliksD implements Initializable {
-    private static final int ROWS = 6;
+    private static final int ROWS = 3;
     private static int COLUMNS = 7;
     private static final int TOTAL_IMAGES = 20;
 
-    private static final double MOVIE_IMG_HEIGHT = 120.0;
-    private static final double MOVIE_IMG_WIDTH = 80.0;
+    private static final double MOVIE_IMG_HEIGHT = 220.0;
+    private static final double MOVIE_IMG_WIDTH = 147.0;
 
 
     private final Map<Integer, Integer> rowIndices = new HashMap<>();
     private final Map<Integer, Integer> highestRowIndices = new HashMap<>();
     // HashMap to store ImageViews for reuse
     private final Map<Integer, ImageView> imageViewMap = new HashMap<>();
+    private ArrayList<String> movieDisplayLabels = new ArrayList<>();
     private Stage primaryStage;
     private Scene scene;
     @FXML
@@ -51,6 +53,7 @@ public class NetfliksD implements Initializable {
             highestRowIndices.put(i, calculateImagesToShow()); // Set to the default value (maximum images in a row)
         }
         COLUMNS = calculateImagesToShow();
+        setLabelName();
         createImageGrid();
         listenersWindowsSize();
     }
@@ -71,13 +74,13 @@ public class NetfliksD implements Initializable {
 
         // Update highestRowIndices for all rows
         for (int i = 0; i < ROWS; i++) {
-            //highestRowIndices.put(i, imagesPerRowInt);
+            // highestRowIndices.put(i, imagesPerRowInt);
         }
-        return imagesPerRowInt;
+        return imagesPerRowInt - 1;
     }
 
     private void updateMovieLists() {
-        System.out.println("We want see " + calculateImagesToShow() + "picture(s)");
+        System.out.println("We want see " + calculateImagesToShow() + " picture(s)");
     }
 
     Button rightArrowButton, leftArrowButton;
@@ -87,7 +90,7 @@ public class NetfliksD implements Initializable {
             GridPane gridPane = new GridPane();
             gridPane.setHgap(5);
             gridPane.setVgap(0);
-            gridPane.setPadding(new Insets(0, 0, 0, 5));
+            gridPane.setPadding(new Insets(0, 0, 10, 5));
 
             // Create HBox to hold arrow buttons
             HBox arrowButtonsHBox = new HBox();
@@ -130,7 +133,7 @@ public class NetfliksD implements Initializable {
 
 
             VBox GridPaneArrowTitleVBox = new VBox();
-            Label movieTabTitle = new Label("Title who knows what it not could be? ");
+            Label movieTabTitle = new Label(movieDisplayLabels.get(row));
             movieTabTitle.setId("movieTabTitle");
 
 
@@ -141,6 +144,12 @@ public class NetfliksD implements Initializable {
             GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, arrowButtonsHBox);
             movieDisplayHelper.getChildren().add(GridPaneArrowTitleVBox);
         }
+    }
+
+    private void setLabelName() {
+        movieDisplayLabels.add("Movies seen");
+        movieDisplayLabels.add("Recommended movies");
+        movieDisplayLabels.add("Movies not seen");
     }
 
 
