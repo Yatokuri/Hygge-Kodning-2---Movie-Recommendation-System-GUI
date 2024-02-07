@@ -61,7 +61,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
                   </ImageView>
-                  <MenuButton mnemonicParsing="false" prefHeight="45.0" prefWidth="126.0" stylesheets="@/CSS/Main.css" text="Username">
+                  <MenuButton fx:id="userName" mnemonicParsing="false" prefHeight="45.0" prefWidth="126.0" stylesheets="@/CSS/Main.css" text="Username">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Action 1" />
                         <MenuItem mnemonicParsing="false" text="Action 2" />

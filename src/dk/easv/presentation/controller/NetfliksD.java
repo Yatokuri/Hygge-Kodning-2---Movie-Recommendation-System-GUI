@@ -1,5 +1,7 @@
 package dk.easv.presentation.controller;
 
+import dk.easv.presentation.model.AppModel;
+import dk.easv.entities.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -7,16 +9,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class NetfliksD implements Initializable {
     private static final int ROWS = 3;
@@ -26,16 +27,29 @@ public class NetfliksD implements Initializable {
     private static final double MOVIE_IMG_HEIGHT = 220.0;
     private static final double MOVIE_IMG_WIDTH = 147.0;
 
+    private ImageView Image;
 
     private final Map<Integer, Integer> rowIndices = new HashMap<>();
     private final Map<Integer, Integer> highestRowIndices = new HashMap<>();
     // HashMap to store ImageViews for reuse
     private final Map<Integer, ImageView> imageViewMap = new HashMap<>();
+
+    private final Map<Integer, ImageView> imageInMovielist = new HashMap<>();
+    private final Map<Integer, Integer> imageInMovielistCount = new HashMap<>();
+
     private ArrayList<String> movieDisplayLabels = new ArrayList<>();
     private Stage primaryStage;
     private Scene scene;
     @FXML
     private VBox movieDisplay, movieDisplayHelper;
+    @FXML
+    private MenuButton userName;
+
+    private AppModel appModel;
+
+    public NetfliksD(){
+        AppModel appModel = new AppModel();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -47,12 +61,47 @@ public class NetfliksD implements Initializable {
     }
 
     public void startupNetfliks() {
+        AppModel appModel = new AppModel();
+        List<String> selectedMovies = new ArrayList<>();
+        selectedMovies = appModel.getMoviesFromIndex(20);
+        System.out.println("_______________Selected movies________________");
+        for (String movie : selectedMovies) {
+            System.out.println(movie);
+        }
+
+
+     //   AppModel.getObsTopMovieSeen()
+
+        //imageInMovielist.add()
+
+      /*  for (int i = 0; i < ROWS; i++) {
+            movie = AppModel.getObsTopMovieSeen();
+            String posterPath = movie.getPosterPath();
+            if (posterPath != null && !posterPath.isEmpty()) {
+                InputStream stream;
+                try {
+                    stream = new URL(posterPath).openStream();
+                    ImageView image = new ImageView(String.valueOf(stream));
+                    stream.close();
+                    imageInMovielist.put(i, image);
+                    highestRowIndices.put(i, calculateImagesToShow()); // Set to the default value (maximum images in a row)
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            }
+        */
+
+
+
+
         // Initialize rowIndices with 0 for each row
         for (int i = 0; i < ROWS; i++) {
             rowIndices.put(i, 0);
             highestRowIndices.put(i, calculateImagesToShow()); // Set to the default value (maximum images in a row)
         }
         COLUMNS = calculateImagesToShow();
+       // userName.setText();
         setLabelName();
         createImageGrid();
         listenersWindowsSize();

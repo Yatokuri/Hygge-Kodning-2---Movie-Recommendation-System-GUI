@@ -7,6 +7,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AppModel {
 
     LogicManager logic = new LogicManager();
@@ -18,6 +21,22 @@ public class AppModel {
     private final ObservableList<TopMovie> obsTopMoviesSimilarUsers = FXCollections.observableArrayList();
 
     private final SimpleObjectProperty<User> obsLoggedInUser = new SimpleObjectProperty<>();
+
+
+
+    public List<String> getMoviesFromIndex(int startIndex) {
+        List<String> obsTopMovieNotSeenNew = new ArrayList<>();
+        int endIndex = Math.min(startIndex + 19, obsTopMovieNotSeen.size() - 1);
+
+
+        for (int i = startIndex; i < endIndex; i++) {
+            obsTopMovieNotSeenNew.add(String.valueOf(obsTopMovieSeen.get(i)));
+        }
+        return obsTopMovieNotSeenNew;
+        //TOD
+    }
+
+
 
     public void loadUsers(){
         obsUsers.clear();

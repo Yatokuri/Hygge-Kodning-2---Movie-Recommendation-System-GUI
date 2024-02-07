@@ -8,6 +8,7 @@ public class Movie {
     private String title;
     private int year;
     private List<Rating> ratings;
+    private String posterPath;
 
     public Movie(int id, String title, int year) {
         this.id = id;

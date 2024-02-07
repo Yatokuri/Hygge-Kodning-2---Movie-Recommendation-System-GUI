@@ -46,7 +46,7 @@ public class LogInController implements Initializable {
             List<String> userLines = Files.readAllLines(Path.of("data/users.txt"));
             if (model.getObsLoggedInUser()!= null){
                 for (String s: userLines ) {
-                    System.out.println(s);
+                    //System.out.println(s);
                 }
                 //String currentUser = userLines.get()
                 //int userId = model.getObsLoggedInUser().getId();
@@ -116,7 +116,9 @@ public class LogInController implements Initializable {
             bufferedWriter.newLine();
             bufferedWriter.write(newUser);
 
+            new Alert(Alert.AlertType.CONFIRMATION, "User created successfully");
         } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "User not created successfully");
             throw new RuntimeException(e);
         }
     }
