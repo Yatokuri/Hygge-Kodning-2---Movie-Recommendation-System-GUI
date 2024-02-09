@@ -2,13 +2,13 @@ package dk.easv.presentation.model;
 
 import dk.easv.entities.*;
 import dk.easv.logic.LogicManager;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class AppModel {
 
@@ -25,17 +25,32 @@ public class AppModel {
 
 
     public List<Movie> getMoviesFromIndex(String ObLName, int startIndex) throws Exception {
-        List<Movie> obsTopMovieNotSeenNew = new ArrayList<>();
-
         // Use reflection to get the ObservableList<Movie> object by its name Test way
         ObservableList<Movie> listObLName = (ObservableList<Movie>) getClass().getDeclaredField(ObLName).get(this);
-        int endIndex = Math.min(startIndex + 20, listObLName.size()); // Corrected
+        int endIndex = Math.min(startIndex + 20, listObLName.size()); //We always load 20 picture ahead
+
+        // Create a list to hold CompletableFuture instances
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         for (int i = startIndex; i < endIndex; i++) {
-            logic.giveMoviePosterPath(listObLName.get(i));
-            obsTopMovieNotSeenNew.add(listObLName.get(i));
+            // Create a CompletableFuture for each movie and add it to the list, so it can run faster
+            int finalI = i;
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    logic.giveMoviePosterPath(listObLName.get(finalI));
+                } catch (Exception e) {
+                    e.printStackTrace(); // Handle exceptions appropriately
+                }
+            });
+            futures.add(future);
         }
-        return obsTopMovieNotSeenNew;
+
+        // Wait for all CompletableFuture instances to complete
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        allOf.join();
+
+        // Return the updated list of movies
+        return new ArrayList<>(listObLName.subList(startIndex, endIndex));
     }
 
 
