@@ -268,15 +268,8 @@ public class NetfliksD implements Initializable {
         imageInMovieListCurrentFirstIndex.put(row, startIndex);
         imageInMovieListCurrentLastIndex.put(row, startIndex+numImages);
 
-
-        if (startIndex+numImages > imageInMovieListCount.get(row))  { //TODO When windows gets resize sometimes it can show weird image count
-            loadMoreMovie(row, imageInMovieListCount.get(row)+1);
-        }
-
-
-        // Assuming loadMoreMovie method returns CompletableFuture<Void>
-
-        if (startIndex + numImages > imageInMovieListCount.get(row)) {
+        
+        if (startIndex + numImages > imageInMovieListCount.get(row)-5) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> loadMoreMovie(row, imageInMovieListCount.get(row) + 1));
             future.thenRun(() -> {
             });
