@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class AppModel {
 
@@ -25,8 +26,19 @@ public class AppModel {
 
 
     public List<Movie> getMoviesFromIndex(String ObLName, int startIndex) throws Exception {
+        List<Movie> listObLName = FXCollections.observableArrayList();
+
+        if (ObLName.equals("obsTopMoviesSimilarUsers")) { // Here we need to take the movie instance inside the TopMovie entities
+            ObservableList<TopMovie> topMovies = (ObservableList<TopMovie>) getClass().getDeclaredField(ObLName).get(this);
+            listObLName = topMovies.stream() // Iterate through the sublist of listObLName
+                    .map(TopMovie::getMovie)
+                    .collect(Collectors.toList());
+        }
+
+        if (listObLName.isEmpty())    {
+            listObLName = (ObservableList<Movie>) getClass().getDeclaredField(ObLName).get(this);
+        }
         // Use reflection to get the ObservableList<Movie> object by its name Test way
-        ObservableList<Movie> listObLName = (ObservableList<Movie>) getClass().getDeclaredField(ObLName).get(this);
         int endIndex = Math.min(startIndex + 20, listObLName.size()); //We always load 20 picture ahead
 
         // Create a list to hold CompletableFuture instances
@@ -35,9 +47,10 @@ public class AppModel {
         for (int i = startIndex; i < endIndex; i++) {
             // Create a CompletableFuture for each movie and add it to the list, so it can run faster
             int finalI = i;
+            List<Movie> finalListObLName = listObLName;
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
-                    logic.giveMoviePosterPath(listObLName.get(finalI));
+                    logic.giveMoviePosterPath(finalListObLName.get(finalI));
                 } catch (Exception e) {
                     e.printStackTrace(); // Handle exceptions appropriately
                 }

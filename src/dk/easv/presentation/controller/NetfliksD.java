@@ -2,10 +2,12 @@ package dk.easv.presentation.controller;
 
 import dk.easv.entities.Movie;
 import dk.easv.presentation.model.AppModel;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -18,7 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NetfliksD implements Initializable {
     private static final int ROWS = 3;
@@ -33,10 +35,13 @@ public class NetfliksD implements Initializable {
     private final Map<Integer, ImageView> imageMovieList = new HashMap<>(); //Here we save all imageview with a unique key
     private final Map<Integer, List<Integer>> imageMovieListIdentifier = new HashMap<>(); //Here we save all image key to a specific list of picture (key)
     private final Map<Integer, Integer> imageInMovieListCount = new HashMap<>(); //Here we save the count of each row of img
-    private final Map<Integer, Integer> imageInMovieListCurrentLastIndex = new HashMap<>(); //Here we save the last index of current showet movies
-    private final Map<Integer, Integer> imageInMovieListCurrentFirstIndex = new HashMap<>(); //Here we save the first index of current showet movies
+    private final Map<Integer, Integer> imageInMovieListCurrentLastIndex = new HashMap<>(); //Here we save the last index of current showed movies
+    private final Map<Integer, Integer> imageInMovieListCurrentFirstIndex = new HashMap<>(); //Here we save the first index of current showed movies
 
     ArrayList<GridPane> gridPaneList = new ArrayList<>();
+
+    ArrayList<Double> previousSpacerValue = new ArrayList<>(); // This save the value with the space we need between arrows
+    ArrayList<Double> previousSpacerLockValue = new ArrayList<>(); // This save how many picture there is 100% showed
     ArrayList<String> movieListTest = new ArrayList<>();
 
     private ArrayList<String> movieDisplayLabels = new ArrayList<>();
@@ -85,7 +90,7 @@ public class NetfliksD implements Initializable {
 
         movieListTest.add("obsTopMovieNotSeen");
         movieListTest.add("obsTopMovieSeen");
-        movieListTest.add("obsTopMovieNotSeen");
+        movieListTest.add("obsTopMoviesSimilarUsers");
     }
 
     public void startupNetfliks() {
@@ -159,10 +164,22 @@ public class NetfliksD implements Initializable {
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> updateMovieLists());
 
         primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> updateMovieLists());
+
+        primaryStage.iconifiedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                updateRightArrow();
+            }
+        });
+
+        primaryStage.maximizedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                updateRightArrow();
+            }
+        });
     }
 
     private int calculateImagesToShow() { //Helper method to know the number of picture there can be show in the moment
-        return (int) Math.ceil(primaryStage.getWidth() / MOVIE_IMG_WIDTH) - 1;
+        return (int) Math.ceil(primaryStage.getWidth() / (MOVIE_IMG_WIDTH + 5)) ; // 5 take care of the gap between image
     }
 
 
@@ -196,12 +213,11 @@ public class NetfliksD implements Initializable {
 
             // Create HBox to hold arrow buttons
             HBox arrowButtonsHBox = new HBox();
-            arrowButtonsHBox.setAlignment(Pos.CENTER);
-            VBox.setMargin(arrowButtonsHBox, new Insets(-MOVIE_IMG_HEIGHT- 5, 10,0 , 10));
-
+            arrowButtonsHBox.setAlignment(Pos.TOP_LEFT);
+            VBox.setMargin(arrowButtonsHBox, new Insets(-MOVIE_IMG_HEIGHT - 5, 10, 0, 10));
 
             imageInMovieListCurrentLastIndex.put(row, 0);
-
+            previousSpacerLockValue.add(row, 0.0);
             // Create Left Arrow Button
             leftArrowButton = new Button("←");
             leftArrowButton.setId("arrowButton"); // To CSS
@@ -213,8 +229,6 @@ public class NetfliksD implements Initializable {
             HBox.setHgrow(rightArrowButton, Priority.NEVER);
             updateRow(gridPane, row, 0, currentMovieShowingCount);
 
-
-
             // Create Left Arrow Button OnAction
             int finalRow = row;
             leftArrowButton.setOnAction(e -> handleLeftArrow(gridPane, finalRow));
@@ -224,27 +238,60 @@ public class NetfliksD implements Initializable {
             rightArrowButton.setOnAction(e -> handleRightArrow(gridPane, finalRow1));
 
             Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.SOMETIMES);
-            //TODO The right arrows is not always visible it depend of last grid pane!
-
             // Add arrows buttons to HBox
             arrowButtonsHBox.getChildren().addAll(leftArrowButton, spacer, rightArrowButton);
-
-
-
 
             VBox GridPaneArrowTitleVBox = new VBox();
             Label movieTabTitle = new Label(movieDisplayLabels.get(row));
             movieTabTitle.setId("movieTabTitle"); // To CSS
-
-
 
             VBox.setMargin(gridPane, new Insets(0, 0, MOVIE_IMG_HEIGHT/2.4, 0));
             movieDisplayHelper.setSpacing(MOVIE_IMG_HEIGHT/2.4);
 
             GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, arrowButtonsHBox);
             movieDisplayHelper.getChildren().add(GridPaneArrowTitleVBox);
+
+            previousSpacerValue.add(row, 0.0);
+
+            AtomicBoolean ifBlockExecuted = new AtomicBoolean(true); // Flag to track if the condition block has been executed
+
+            // Listener to print the gridPanes last column x-coordinate and window size
+            primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> {
+                Platform.runLater(() -> {
+
+                double value = previousSpacerValue.get(gridPaneList.indexOf(gridPane));
+                double checkValue = (currentMovieShowingCount);
+                double lastColumnX = 0.0;
+
+                if (!gridPane.getChildren().isEmpty()) {
+                    Node lastChild = gridPane.getChildren().get(gridPane.getChildren().size() - 1);
+                    lastColumnX = GridPane.getColumnIndex(lastChild) * (lastChild.getBoundsInParent().getWidth() + gridPane.getHgap());
+                }
+
+                if (previousSpacerLockValue.get(gridPaneList.indexOf(gridPane)) == checkValue || previousSpacerLockValue.get(gridPaneList.indexOf(gridPane)) == (checkValue + 1)) {
+                    value = primaryStage.getWidth() - ((currentMovieShowingCount - 1) * (MOVIE_IMG_WIDTH + 5));
+                    previousSpacerValue.set(gridPaneList.indexOf(gridPane), value);
+                    ifBlockExecuted.set(true); // Update the flag
+                } else if (ifBlockExecuted.get()) { // Check if the condition block has been executed before
+                    value = (previousSpacerValue.get(gridPaneList.indexOf(gridPane))+(5));
+                    previousSpacerValue.set(gridPaneList.indexOf(gridPane), value);
+                    ifBlockExecuted.set(false); // Reset the flag
+                }
+
+                spacer.setPrefWidth(lastColumnX-90+value);
+                arrowButtonsHBox.setMaxSize(lastColumnX+value,Region.USE_COMPUTED_SIZE);
+                gridPane.setMaxSize(lastColumnX,Region.USE_COMPUTED_SIZE);
+                });
+            });
         }
+
+        // Update the right arrow from start
+        updateRightArrow();
+    }
+
+    private void updateRightArrow() { // Trick our "Listener" to be detected
+        primaryStage.setWidth(primaryStage.getWidth()+1);
+        primaryStage.setWidth(primaryStage.getWidth()-1);
     }
 
 
@@ -268,23 +315,21 @@ public class NetfliksD implements Initializable {
         imageInMovieListCurrentFirstIndex.put(row, startIndex);
         imageInMovieListCurrentLastIndex.put(row, startIndex+numImages);
 
-        
         if (startIndex + numImages > imageInMovieListCount.get(row)-5) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> loadMoreMovie(row, imageInMovieListCount.get(row) + 1));
-            future.thenRun(() -> {
-            });
+            loadMoreMovie(row, imageInMovieListCount.get(row) + 1);
         }
-
 
         for (int i = startIndex; i < endIndex; i++) {
             Integer key = keys.get(i);
             ImageView imageView = imageMovieList.get(key); // Retrieve ImageView using the key
+            if (imageView == null)    {imageView = new ImageView("/Icons/NoMovieIMGFound.jpg");} //Handle special case where imageView is null
             imageView.setFitWidth(MOVIE_IMG_WIDTH);
             imageView.setFitHeight(MOVIE_IMG_HEIGHT);
             gridPane.add(imageView, colIndex, row);
             colIndex++;
         }
 
+        previousSpacerLockValue.set(row, (double) (endIndex-startIndex)); // Update lock value
     }
 
     private void handleLeftArrow(GridPane gridPane, int row) {
@@ -303,14 +348,12 @@ public class NetfliksD implements Initializable {
 
         if (startValue == 0)    { // When user want go left when there are showing first picture on the list
             updateRow(gridPane, row,  imageInMovieListCount.get(row)-currentMovieShowingCount+1, currentMovieShowingCount);
-            return;
-        }
-        if (startValue < currentMovieShowingCount)   { // When user want go left but the system cannot show the right only new movie it must start from 0 and show some dupe
+        } else if (startValue < currentMovieShowingCount)   { // When user want go left but the system cannot show the right only new movie it must start from 0 and show some dupe
             updateRow(gridPane, row, 0, currentMovieShowingCount);
-            return;
+        } else {
+            updateRow(gridPane, row, startValue - currentMovieShowingCount, currentMovieShowingCount);
         }
-
-        updateRow(gridPane, row, startValue-currentMovieShowingCount, currentMovieShowingCount);
+        updateRightArrow();
     }
 
     private void handleRightArrow(GridPane gridPane, int row) {
@@ -322,7 +365,10 @@ public class NetfliksD implements Initializable {
             currentIndex = 0;
         }
         rowIndices.put(row, currentIndex);
-        updateRow(gridPane, row, imageInMovieListCurrentLastIndex.get(row), currentMovieShowingCount);
+        updateRow(gridPane, row, imageInMovieListCurrentLastIndex.get(row)-1, currentMovieShowingCount);
+
+        previousSpacerValue.set(gridPaneList.indexOf(gridPane), gridPane.getWidth() - ((currentMovieShowingCount - 1) * (MOVIE_IMG_WIDTH + 5))); // The same as createImageGrid() end
+        updateRightArrow();
 
     }
 }
