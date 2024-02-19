@@ -13,6 +13,13 @@
     -fx-text-fill: white;
 }
 
+.buttonInvisible {
+    -fx-background-color: none;
+    -fx-border-color: none;
+    -fx-border-radius: none;
+    -fx-background-radius: none;
+}
+
 #customLoginSignUp {
     -fx-background-color: #2a2323;
     -fx-text-fill: white;

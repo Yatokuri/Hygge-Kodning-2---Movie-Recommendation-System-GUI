@@ -127,36 +127,38 @@ public class NetfliksD implements Initializable {
         loadingImageView.setFitHeight(200);
         // Add the loading image to the movieDisplayHelper
         movieDisplayHelper.getChildren().add(loadingImageHBox);
-        movieDisplayList.setVisible(false);
     }
 
     public void createDonateSite() {
-        // Load the loading GIF
-        ImageView loadingImageView = new ImageView(loadingImage);
-        HBox loadingImageHBox = new HBox();
-        loadingImageHBox.setAlignment(Pos.CENTER);
-        loadingImageHBox.setPrefHeight((primaryStage.getHeight()- navBar.getHeight()));
-        loadingImageHBox.getChildren().add(loadingImageView);
-        // Set the size of the loading image as needed
-        loadingImageView.setFitWidth(200);
-        loadingImageView.setFitHeight(200);
-        // Add the loading image to the movieDisplayHelper
-        movieDisplayDonate.getChildren().add(loadingImageHBox);
+        // Create a label
+        Label titleLbl = new Label("\"Donate\"");
+        titleLbl.setStyle("-fx-font-size: 100;"); // Set font size to 14
+
+        // Create an HBox to center the label vertically
+        HBox loadingTextHBox = new HBox();
+        loadingTextHBox.setAlignment(Pos.CENTER);
+        loadingTextHBox.setPrefHeight((primaryStage.getHeight() - navBar.getHeight()));
+        loadingTextHBox.getChildren().add(titleLbl);
+
+        // Add the HBox with the label to the movieDisplayList
+        movieDisplayDonate.getChildren().add(loadingTextHBox);
         movieDisplayDonate.setVisible(false);
     }
 
     public void createListSite() {
-        // Load the loading GIF
-        ImageView loadingImageView = new ImageView(loadingImage);
-        HBox loadingImageHBox = new HBox();
-        loadingImageHBox.setAlignment(Pos.CENTER);
-        loadingImageHBox.setPrefHeight((primaryStage.getHeight()- navBar.getHeight()));
-        loadingImageHBox.getChildren().add(loadingImageView);
-        // Set the size of the loading image as needed
-        loadingImageView.setFitWidth(200);
-        loadingImageView.setFitHeight(200);
-        // Add the loading image to the movieDisplayHelper
-        movieDisplayList.getChildren().add(loadingImageHBox);
+        // Create a label
+        Label titleLbl = new Label("\"My List\"");
+        titleLbl.setStyle("-fx-font-size: 100;"); // Set font size to 14
+
+        // Create an HBox to center the label vertically
+        HBox loadingTextHBox = new HBox();
+        loadingTextHBox.setAlignment(Pos.CENTER);
+        loadingTextHBox.setPrefHeight((primaryStage.getHeight() - navBar.getHeight()));
+        loadingTextHBox.getChildren().add(titleLbl);
+
+        // Add the HBox with the label to the movieDisplayList
+        movieDisplayList.getChildren().add(loadingTextHBox);
+        movieDisplayList.setVisible(false);
     }
 
     public void startupNetfliks() {
@@ -474,30 +476,32 @@ public class NetfliksD implements Initializable {
 
 
     @FXML
-    private void onDonateBtn(ActionEvent actionEvent) {
+    private void onDonateBtn() {
         movieDisplayHelper.setVisible(false);
+        movieDisplayHelper.setManaged(false);
         movieDisplayList.setVisible(false);
+        movieDisplayList.setManaged(false);
         movieDisplayDonate.setVisible(true);
+        movieDisplayDonate.setManaged(true);
     }
 
     @FXML
-    private void onMyListBtn(ActionEvent actionEvent) {
+    private void onMyListBtn() {
         movieDisplayHelper.setVisible(false);
-        movieDisplayDonate.setVisible(false);
+        movieDisplayHelper.setManaged(false);
         movieDisplayList.setVisible(true);
+        movieDisplayList.setManaged(true);
+        movieDisplayDonate.setVisible(false);
+        movieDisplayDonate.setManaged(false);
     }
 
     @FXML
-    private void onHomeBtn(ActionEvent actionEvent) {
+    private void onHomeBtn() {
         movieDisplayHelper.setVisible(true);
-        movieDisplayDonate.setVisible(false);
+        movieDisplayHelper.setManaged(true);
         movieDisplayList.setVisible(false);
-    }
-
-    @FXML
-    private void onLogoBtn(MouseEvent mouseEvent) {
-        movieDisplayHelper.setVisible(true);
+        movieDisplayList.setManaged(false);
         movieDisplayDonate.setVisible(false);
-        movieDisplayList.setVisible(false);
+        movieDisplayDonate.setManaged(false);
     }
 }

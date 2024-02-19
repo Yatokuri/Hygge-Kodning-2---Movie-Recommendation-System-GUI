@@ -10,8 +10,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -26,15 +29,22 @@ import java.util.ResourceBundle;
 
 public class LogInController implements Initializable {
     @FXML private PasswordField passwordField;
-    @FXML private TextField userId;
+    @FXML private TextField userId, passwordFieldPlain;
     private AppModel model;
     private DisplayErrorModel displayErrorModel;
     private Stage loginStage;
+    private static final Image EyeOnIcon = new Image ("/Icons/EyeOn.png");
+    private static final Image EyeOffIcon = new Image ("/Icons/EyeOff.png");
+    @FXML
+    private ImageView togglePasswordImg;
+
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         model = new AppModel();
         displayErrorModel = new DisplayErrorModel();
+        togglePasswordImg.setImage(EyeOffIcon);
     }
 
     public void logIn(ActionEvent actionEvent) {
@@ -43,7 +53,7 @@ public class LogInController implements Initializable {
         if(model.getObsLoggedInUser()!=null)
         {
         if (passwordField.getText().startsWith("1"))  {
-            displayErrorModel.displayErrorC("Wrong password");
+            displayErrorModel.displayErrorC("Wrong username or password");
             return;
         }
         try {
@@ -89,8 +99,7 @@ public class LogInController implements Initializable {
         }
         }
         else{
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Wrong username or password");
-            alert.showAndWait();
+            displayErrorModel.displayErrorC("Wrong username or password");
         }
     }
 
@@ -111,4 +120,20 @@ public class LogInController implements Initializable {
         }
     }
     public void setLoginStage(Stage loginStage) {this.loginStage = loginStage;}
+
+    @FXML
+    private void togglePassword() {
+        if (togglePasswordImg.getImage() == EyeOnIcon) {
+            togglePasswordImg.setImage(EyeOffIcon);
+            passwordField.setVisible(false);
+            passwordFieldPlain.setText(passwordField.getText());
+            passwordFieldPlain.setVisible(true);
+
+        } else {
+            togglePasswordImg.setImage(EyeOnIcon);
+            passwordField.setVisible(true);
+            passwordField.setText(passwordFieldPlain.getText());
+            passwordFieldPlain.setVisible(false);
+        }
+    }
 }

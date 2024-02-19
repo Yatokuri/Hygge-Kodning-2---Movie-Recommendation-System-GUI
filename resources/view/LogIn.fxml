@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -25,6 +29,24 @@
                <children>
                   <PasswordField fx:id="passwordField" GridPane.rowIndex="1" />
                   <TextField fx:id="userId" text="Georgi Facello" />
+                  <TextField fx:id="passwordFieldPlain" visible="false" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                  <TextField prefHeight="25.0" prefWidth="167.0" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets left="218.0" />
+                     </GridPane.margin>
+                  </TextField>
+                  <Button mnemonicParsing="false" onAction="#togglePassword" styleClass="buttonInvisible" stylesheets="@../CSS/Login.css" GridPane.rowIndex="1">
+                     <graphic>
+                        <ImageView fx:id="togglePasswordImg" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true">
+                           <image>
+                              <Image url="@../Icons/EyeOff.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <GridPane.margin>
+                        <Insets left="215.0" />
+                     </GridPane.margin>
+                  </Button>
                </children>
             </GridPane>
             <GridPane layoutX="160.0" layoutY="159.0" prefHeight="30.0" prefWidth="133.0">
