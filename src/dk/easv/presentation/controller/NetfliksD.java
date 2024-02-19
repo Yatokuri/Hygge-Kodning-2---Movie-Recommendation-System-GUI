@@ -3,16 +3,20 @@ package dk.easv.presentation.controller;
 import dk.easv.entities.Movie;
 import dk.easv.presentation.model.AppModel;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -20,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NetfliksD implements Initializable {
@@ -45,13 +50,20 @@ public class NetfliksD implements Initializable {
     ArrayList<String> movieListTest = new ArrayList<>();
 
     private ArrayList<String> movieDisplayLabels = new ArrayList<>();
-    private Stage primaryStage;
+    private Stage primaryStage, loginStage;
     @FXML
-    private VBox movieDisplay, movieDisplayHelper;
+    private VBox mainDisplay, movieDisplayHelper, movieDisplayMovie, movieDisplayList, movieDisplayDonate;
     @FXML
     private MenuButton userName;
 
     private AppModel appModel;
+
+    private LogInController loginController;
+
+    @FXML
+    private MenuItem menuItemLogout;
+    @FXML
+    private HBox navBar;
 
     public NetfliksD(){
 
@@ -59,11 +71,17 @@ public class NetfliksD implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        logoutUserFunction();
     }
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
+
+    public void setLoginStage(Stage loginStage) {
+        this.loginStage = loginStage;
+    }
+
 
     public void setModel(AppModel appModel) {
         this.appModel = appModel;
@@ -91,24 +109,81 @@ public class NetfliksD implements Initializable {
         movieListTest.add("obsTopMovieNotSeen");
         movieListTest.add("obsTopMovieSeen");
         movieListTest.add("obsTopMoviesSimilarUsers");
+
+    }
+
+    Image loadingImage = new Image(getClass().getResourceAsStream("/Icons/loading.gif"));
+    public void startupNetfliksLoadingScreen() {
+        // Load the loading GIF
+        ImageView loadingImageView = new ImageView(loadingImage);
+
+        HBox loadingImageHBox = new HBox();
+        loadingImageHBox.setAlignment(Pos.CENTER);
+        loadingImageHBox.setPrefHeight((primaryStage.getHeight()- navBar.getHeight()));
+        loadingImageHBox.getChildren().add(loadingImageView);
+
+        // Set the size of the loading image as needed
+        loadingImageView.setFitWidth(200);
+        loadingImageView.setFitHeight(200);
+        // Add the loading image to the movieDisplayHelper
+        movieDisplayHelper.getChildren().add(loadingImageHBox);
+        movieDisplayList.setVisible(false);
+    }
+
+    public void createDonateSite() {
+        // Load the loading GIF
+        ImageView loadingImageView = new ImageView(loadingImage);
+        HBox loadingImageHBox = new HBox();
+        loadingImageHBox.setAlignment(Pos.CENTER);
+        loadingImageHBox.setPrefHeight((primaryStage.getHeight()- navBar.getHeight()));
+        loadingImageHBox.getChildren().add(loadingImageView);
+        // Set the size of the loading image as needed
+        loadingImageView.setFitWidth(200);
+        loadingImageView.setFitHeight(200);
+        // Add the loading image to the movieDisplayHelper
+        movieDisplayDonate.getChildren().add(loadingImageHBox);
+        movieDisplayDonate.setVisible(false);
+    }
+
+    public void createListSite() {
+        // Load the loading GIF
+        ImageView loadingImageView = new ImageView(loadingImage);
+        HBox loadingImageHBox = new HBox();
+        loadingImageHBox.setAlignment(Pos.CENTER);
+        loadingImageHBox.setPrefHeight((primaryStage.getHeight()- navBar.getHeight()));
+        loadingImageHBox.getChildren().add(loadingImageView);
+        // Set the size of the loading image as needed
+        loadingImageView.setFitWidth(200);
+        loadingImageView.setFitHeight(200);
+        // Add the loading image to the movieDisplayHelper
+        movieDisplayList.getChildren().add(loadingImageHBox);
     }
 
     public void startupNetfliks() {
-        System.out.println("Start " + LocalDateTime.now());
         setLabelNameAndList(); //Temp Way
         appModel.loadUsers();
         appModel.loadData(appModel.getObsLoggedInUser()); //We load the data from the user log in
         userName.setText(appModel.getObsLoggedInUser().getName());
 
-        for (int r = 0; r < ROWS; r++) {
-            loadMoreMovie(r, DEFAULT_PRE_LOADED_IMG);
-            rowIndices.put(r, 0); // Initialize rowIndices with 0 for each row
-        }
+        // Asynchronously load movies
+        CompletableFuture<Void> loadMoviesFuture = CompletableFuture.runAsync(() -> {
+            for (int r = 0; r < ROWS; r++) {
+                loadMoreMovie(r, DEFAULT_PRE_LOADED_IMG);
+                rowIndices.put(r, 0); // Initialize rowIndices with 0 for each row
+            }
+        });
 
-        currentMovieShowingCount = calculateImagesToShow();
-        createImageGrid();
-        listenersWindowsSize();
-        System.out.println("Done " + LocalDateTime.now());
+        // After movies are loaded, update UI with picture
+        loadMoviesFuture.thenRun(() -> {
+            Platform.runLater(() -> {
+                movieDisplayHelper.getChildren().clear();
+                currentMovieShowingCount = calculateImagesToShow();
+                createImageGrid();
+                listenersWindowsSize();
+                createListSite();
+                createDonateSite();
+            });
+        });
     }
 
     private void loadMoreMovie(Integer movieRowIndex, Integer loadingStartIndex) {
@@ -159,6 +234,32 @@ public class NetfliksD implements Initializable {
         return imageView;
     }
 
+    private void logoutUserFunction(){
+
+        menuItemLogout.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LogIn.fxml"));
+                    Stage currentStage = (Stage) navBar.getScene().getWindow();
+                    Parent root = loader.load();
+                    currentStage.getScene().setRoot(root);
+
+                    // Set the scene in the existing stage
+                    //currentStage.setScene(new Scene(root));
+                    currentStage.setMinWidth(0);
+                    currentStage.setMinHeight(0);
+                    currentStage.setMaxWidth(454);
+                    currentStage.setMaxHeight(256);
+                    currentStage.setResizable(false);
+                    currentStage.setMaximized(false);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 
     private void listenersWindowsSize()  { // Add listener to scene's width and height properties
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> updateMovieLists());
@@ -167,13 +268,13 @@ public class NetfliksD implements Initializable {
 
         primaryStage.iconifiedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                updateRightArrow();
+                updateMovieLists();
             }
         });
 
         primaryStage.maximizedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                updateRightArrow();
+                updateMovieLists();
             }
         });
     }
@@ -184,7 +285,6 @@ public class NetfliksD implements Initializable {
 
 
     private void updateMovieLists() {
-        //System.out.println("We want to see " + calculateImagesToShow() + " picture(s)");
         currentMovieShowingCount = calculateImagesToShow();
         int columns = calculateImagesToShow(); // Assuming calculateImagesToShow() returns the number of columns
 
@@ -199,7 +299,6 @@ public class NetfliksD implements Initializable {
             }
         }
     }
-
 
     Button rightArrowButton, leftArrowButton;
 
@@ -248,6 +347,11 @@ public class NetfliksD implements Initializable {
             VBox.setMargin(gridPane, new Insets(0, 0, MOVIE_IMG_HEIGHT/2.4, 0));
             movieDisplayHelper.setSpacing(MOVIE_IMG_HEIGHT/2.4);
 
+            // gridPane.setStyle("-fx-background-color: #35af0e");
+            // movieTabTitle.setStyle("-fx-background-color: #2a2323");
+            // arrowButtonsHBox.setStyle("-fx-background-color: #f30707");
+
+
             GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, arrowButtonsHBox);
             movieDisplayHelper.getChildren().add(GridPaneArrowTitleVBox);
 
@@ -293,9 +397,6 @@ public class NetfliksD implements Initializable {
         primaryStage.setWidth(primaryStage.getWidth()+1);
         primaryStage.setWidth(primaryStage.getWidth()-1);
     }
-
-
-
 
     private void updateRow(GridPane gridPane, int row, int startIndex, int numImages) {
         if (startIndex < 0) {   // Handle special case where startindex = 0
@@ -369,6 +470,34 @@ public class NetfliksD implements Initializable {
 
         previousSpacerValue.set(gridPaneList.indexOf(gridPane), gridPane.getWidth() - ((currentMovieShowingCount - 1) * (MOVIE_IMG_WIDTH + 5))); // The same as createImageGrid() end
         updateRightArrow();
+    }
 
+
+    @FXML
+    private void onDonateBtn(ActionEvent actionEvent) {
+        movieDisplayHelper.setVisible(false);
+        movieDisplayList.setVisible(false);
+        movieDisplayDonate.setVisible(true);
+    }
+
+    @FXML
+    private void onMyListBtn(ActionEvent actionEvent) {
+        movieDisplayHelper.setVisible(false);
+        movieDisplayDonate.setVisible(false);
+        movieDisplayList.setVisible(true);
+    }
+
+    @FXML
+    private void onHomeBtn(ActionEvent actionEvent) {
+        movieDisplayHelper.setVisible(true);
+        movieDisplayDonate.setVisible(false);
+        movieDisplayList.setVisible(false);
+    }
+
+    @FXML
+    private void onLogoBtn(MouseEvent mouseEvent) {
+        movieDisplayHelper.setVisible(true);
+        movieDisplayDonate.setVisible(false);
+        movieDisplayList.setVisible(false);
     }
 }

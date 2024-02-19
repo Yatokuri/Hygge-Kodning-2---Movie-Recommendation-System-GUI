@@ -11,11 +11,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" stylesheets="@../CSS/Main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.presentation.controller.NetfliksD">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" stylesheets="@../CSS/Main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.presentation.controller.NetfliksD">
    <children>
       <HBox fx:id="navBar" prefHeight="35.0" prefWidth="600.0" stylesheets="@/CSS/Main.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ImageView fitHeight="35.0" fitWidth="140.0">
+            <ImageView fitHeight="35.0" fitWidth="140.0" onMouseClicked="#onLogoBtn">
                <image>
                   <Image url="@../Icons/netfliks.png" />
                </image>
@@ -25,7 +25,7 @@
             </ImageView>
             <HBox prefHeight="45.0" prefWidth="323.0">
                <children>
-                  <Button mnemonicParsing="false" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="Home" textFill="#a40000">
+                  <Button mnemonicParsing="false" onAction="#onHomeBtn" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="Home" textFill="#a40000">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -33,7 +33,7 @@
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="My List" textFill="#a40000">
+                  <Button mnemonicParsing="false" onAction="#onMyListBtn" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="My List" textFill="#a40000">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -41,7 +41,7 @@
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="Donate" textFill="#a40000">
+                  <Button mnemonicParsing="false" onAction="#onDonateBtn" styleClass="buttonInvisible" stylesheets="@/CSS/Main.css" text="Donate" textFill="#a40000">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -63,8 +63,8 @@
                   </ImageView>
                   <MenuButton fx:id="userName" mnemonicParsing="false" prefHeight="45.0" prefWidth="126.0" stylesheets="@/CSS/Main.css" text="Username">
                      <items>
-                        <MenuItem mnemonicParsing="false" text="Action 1" />
-                        <MenuItem mnemonicParsing="false" text="Action 2" />
+                        <MenuItem mnemonicParsing="false" text="Settings" />
+                        <MenuItem fx:id="menuItemLogout" mnemonicParsing="false" text="Logout" />
                      </items>
                      <font>
                         <Font size="16.0" />
@@ -74,9 +74,11 @@
             </HBox>
          </children>
       </HBox>
-      <VBox fx:id="movieDisplay" layoutX="-8.0" layoutY="59.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0">
+      <VBox fx:id="mainDisplay" layoutX="-8.0" layoutY="59.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0">
          <children>
             <VBox fx:id="movieDisplayHelper" VBox.vgrow="ALWAYS" />
+            <VBox fx:id="movieDisplayList" VBox.vgrow="ALWAYS" />
+            <VBox fx:id="movieDisplayDonate" VBox.vgrow="ALWAYS" />
          </children></VBox>
    </children>
 </AnchorPane>
