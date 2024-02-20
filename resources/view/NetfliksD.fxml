@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -78,11 +79,24 @@
             </HBox>
          </children>
       </HBox>
-      <VBox fx:id="mainDisplay" layoutX="-8.0" layoutY="59.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0">
+      <VBox fx:id="mainDisplay" layoutX="-8.0" layoutY="59.0" stylesheets="@../CSS/Main.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0">
          <children>
-            <VBox fx:id="movieDisplayHelper" VBox.vgrow="ALWAYS" />
-            <VBox fx:id="movieDisplayList" VBox.vgrow="ALWAYS" />
-            <VBox fx:id="movieDisplayDonate" VBox.vgrow="ALWAYS" />
-         </children></VBox>
+            <ScrollPane fx:id="scrollPaneMovieDisplay" hmax="0.0" stylesheets="@../CSS/Main.css" VBox.vgrow="ALWAYS">
+               <content>
+                  <AnchorPane fx:id="scrollAnchorPane" stylesheets="@../CSS/Main.css">
+                     <children>
+                        <VBox fx:id="vBoxSizeHelper">
+                           <children>
+                              <VBox fx:id="movieDisplayHelper" />
+                              <VBox fx:id="movieDisplayList" />
+                              <VBox fx:id="movieDisplayDonate" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

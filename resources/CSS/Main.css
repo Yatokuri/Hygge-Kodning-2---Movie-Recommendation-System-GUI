@@ -3,6 +3,10 @@
 #anchorPane {
     -fx-background-color: #8E1A1A; /* Adjust colors as needed */
 }
+#movieAnchorPane {
+    -fx-background-color: #8E1A1A;
+}
+
 #navBar {
     -fx-background-color: black;
 }
@@ -20,6 +24,18 @@
 #arrowButton:hover {
 
     -fx-opacity: 0.8;
+}
+
+#mainDisplay{
+    -fx-background-color: #8E1A1A;
+}
+
+#scrollPaneMovieDisplay{
+    -fx-background-color: #8E1A1A;
+}
+
+#scrollAnchorPane {
+    -fx-background-color: #8E1A1A;
 }
 
 .button {
@@ -89,6 +105,13 @@
     -fx-padding: 5, 0, 5, 0;
 }
 
+.scroll-pane {
+    -fx-background-color: #8E1A1A;
+}
+
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: #8E1A1A;
+}
 
 .text-field{
     -fx-background-color: #258a42;

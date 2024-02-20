@@ -50,6 +50,8 @@ public class LogInController implements Initializable {
     public void logIn(ActionEvent actionEvent) {
         model.loadUsers();
         model.loginUserFromUsername(userId.getText());
+        if(passwordField.isVisible()) passwordFieldPlain.setText(passwordField.getText());
+        if(passwordFieldPlain.isVisible()) passwordField.setText(passwordFieldPlain.getText());
         if(model.getObsLoggedInUser()!=null)
         {
         if (passwordField.getText().startsWith("1"))  {
@@ -62,7 +64,7 @@ public class LogInController implements Initializable {
             //Test D
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/NetfliksD.fxml"));
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            currentStage.setTitle("Movie Recommendation System 0.5 Beta");
+            currentStage.setTitle("Movie Recommendation");
             Parent root = loader.load();
             // Set the scene in the existing stage
             currentStage.setScene(new Scene(root));

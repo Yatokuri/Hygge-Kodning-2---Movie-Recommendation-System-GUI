@@ -1,5 +1,7 @@
 package dk.easv.entities;
 
+import javafx.scene.image.ImageView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +11,20 @@ public class Movie {
     private int year;
     private List<Rating> ratings;
     private String posterPath;
+    private ImageView imageView;
 
     public Movie(int id, String title, int year) {
         this.id = id;
         this.title = title;
         this.year = year;
         this.ratings = new ArrayList<>();
+    }
+
+    public Movie(int id, String title, int year, ImageView imageView) {
+        this.id = id;
+        this.title = title;
+        this.year = year;
+        this.imageView = imageView;
     }
 
     public double getAverageRating(){
@@ -61,6 +71,10 @@ public class Movie {
 
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
+    }
+
+    public ImageView getIMG() {
+        return imageView;
     }
 
     @Override

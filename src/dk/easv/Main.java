@@ -1,10 +1,8 @@
 package dk.easv;
 
 import dk.easv.presentation.controller.LogInController;
-import dk.easv.presentation.controller.NetfliksD;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,7 +18,7 @@ public class Main extends Application {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LogIn.fxml"));
             Parent root = loader.load();
-            loginStage.setTitle("Movie Recommendation Login System 0.5 Beta");
+            loginStage.setTitle("Movie Recommendation Login System");
             loginStage.getIcons().add(new Image("/Icons/mainIcon.png"));
             loginStage.setScene(new Scene(root));
             loginStage.setResizable(false);
