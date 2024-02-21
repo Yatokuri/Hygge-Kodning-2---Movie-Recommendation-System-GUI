@@ -52,16 +52,10 @@ public class NetfliksD implements Initializable {
 
     private ArrayList<String> movieDisplayLabels = new ArrayList<>();
     private Stage primaryStage, loginStage;
+
     @FXML
-    private VBox mainDisplay;
-    @FXML
-    private VBox movieDisplayHelper;
-    @FXML
-    private VBox movieDisplayMovie;
-    @FXML
-    private VBox movieDisplayList;
-    @FXML
-    private VBox movieDisplayDonate;
+    private VBox mainDisplay, movieDisplayMovie, movieDisplayList ,movieDisplayDonate, movieDisplayHelper;
+
     @FXML
     private MenuButton userName;
 
@@ -74,8 +68,6 @@ public class NetfliksD implements Initializable {
     @FXML
     private HBox navBar;
     @FXML
-    private AnchorPane scrollAnchorPane;
-    @FXML
     private ScrollPane scrollPaneMovieDisplay;
     @FXML
     private VBox vBoxSizeHelper;
@@ -87,8 +79,6 @@ public class NetfliksD implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logoutUserFunction();
-        scrollPaneMovieDisplay.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        //scrollPaneMovieDisplay.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -98,7 +88,6 @@ public class NetfliksD implements Initializable {
     public void setLoginStage(Stage loginStage) {
         this.loginStage = loginStage;
     }
-
 
     public void setModel(AppModel appModel) {
         this.appModel = appModel;
@@ -138,23 +127,17 @@ public class NetfliksD implements Initializable {
 
     Image loadingImage = new Image(getClass().getResourceAsStream("/Icons/loading.gif"));
     public void startupNetfliksLoadingScreen() {
-        scrollAnchorPane.setPrefHeight(primaryStage.getHeight()-navBar.getHeight());
-        scrollAnchorPane.setPrefWidth(primaryStage.getWidth());
-        vBoxSizeHelper.setPrefHeight(primaryStage.getHeight()-navBar.getHeight());
-        vBoxSizeHelper.setPrefWidth(primaryStage.getWidth());
-
-
         // Load the loading GIF
         ImageView loadingImageView = new ImageView(loadingImage);
-
+        onHomeBtn();
         HBox loadingImageHBox = new HBox();
         loadingImageHBox.setAlignment(Pos.CENTER);
         loadingImageHBox.setPrefHeight((primaryStage.getHeight()- navBar.getHeight()));
         loadingImageHBox.getChildren().add(loadingImageView);
 
         // Set the size of the loading image as needed
-        loadingImageView.setFitWidth(200);
-        loadingImageView.setFitHeight(200);
+        loadingImageView.setFitWidth(primaryStage.getHeight() * 0.20);
+        loadingImageView.setFitHeight(primaryStage.getHeight() * 0.20);
         // Add the loading image to the movieDisplayHelper
         movieDisplayHelper.getChildren().add(loadingImageHBox);
     }
@@ -192,13 +175,12 @@ public class NetfliksD implements Initializable {
     }
 
     public void startupNetfliks() {
-        setLabelNameAndList(); //Temp Way
-        appModel.loadUsers();
-        appModel.loadData(appModel.getObsLoggedInUser()); //We load the data from the user log in
         userName.setText(appModel.getObsLoggedInUser().getName());
-
         // Asynchronously load movies
         CompletableFuture<Void> loadMoviesFuture = CompletableFuture.runAsync(() -> {
+            setLabelNameAndList();
+            appModel.loadUsers();
+            appModel.loadData(appModel.getObsLoggedInUser()); //We load the data from the user log in
             for (int r = 0; r < ROWS; r++) {
                 loadMoreMovie(r, DEFAULT_PRE_LOADED_IMG);
                 rowIndices.put(r, 0); // Initialize rowIndices with 0 for each row
@@ -214,6 +196,7 @@ public class NetfliksD implements Initializable {
                 listenersWindowsSize();
                 createListSite();
                 createDonateSite();
+                vBoxSizeHelper.toFront();
             });
         });
     }
@@ -241,13 +224,16 @@ public class NetfliksD implements Initializable {
                     imageView = getImageViewMovie(m);
                 }
 
+                if (imageView != null)  {
+                    setupImageEventhandler(imageView, m);
+                }
+
                 // Add the ImageView to the imageMovieList map
                 imageMovieList.put(imageMovieList.size(), imageView);
                 // Set the imageInMovieListCount for the current row (r)
                 imageInMovieListCount.put(movieRowIndex, i);
                 // Add to the multiKeyMap
                 addToMultiKeyMap(movieRowIndex, imageMovieList.size()-1);
-
                 i++;
             }
     }
@@ -266,27 +252,22 @@ public class NetfliksD implements Initializable {
                 throw new RuntimeException(e);
             }
         }
-        // Add event handler to print movie title when clicked
-        assert imageView != null;
-        ImageView finalImageView = imageView;
 
+        return imageView;
+    }
+
+    private void setupImageEventhandler(ImageView imageView, Movie m)   { // Add event handler when user interact with movie
         imageView.setOnMouseEntered(event -> {
             System.out.println("Clicked on movie: " + m.getTitle());
-
-            System.out.println( event.getScreenX() + "_" +  event.getScreenY() + "_" + finalImageView.getLayoutX() + "_" + finalImageView.getLayoutY() );
-
-            finalImageView.setFitHeight(MOVIE_IMG_HEIGHT * 1.02);
-            finalImageView.setFitWidth(MOVIE_IMG_WIDTH * 1.02);
-
+            imageView.setFitHeight(MOVIE_IMG_HEIGHT * 1.02);
+            imageView.setFitWidth(MOVIE_IMG_WIDTH * 1.02);
         });
 
         imageView.setOnMouseExited(event -> {
             System.out.println("Exited movie: " + m.getTitle());
-            finalImageView.setFitHeight(MOVIE_IMG_HEIGHT);
-            finalImageView.setFitWidth(MOVIE_IMG_WIDTH);
-
+            imageView.setFitHeight(MOVIE_IMG_HEIGHT);
+            imageView.setFitWidth(MOVIE_IMG_WIDTH);
         });
-        return imageView;
     }
 
     private void logoutUserFunction(){
@@ -317,16 +298,12 @@ public class NetfliksD implements Initializable {
     }
 
     private void listenersWindowsSize()  { // Add listener to scene's width and height properties
-        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> updateMovieLists());
-
+        primaryStage.widthProperty().addListener((observable, oldValue, newValue) ->  updateMovieLists());
         primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> updateMovieLists());
 
         primaryStage.iconifiedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 updateMovieLists();
-                scrollAnchorPane.setPrefHeight(primaryStage.getHeight()-navBar.getHeight());
-                vBoxSizeHelper.setPrefHeight(primaryStage.getHeight()-navBar.getHeight());
-                vBoxSizeHelper.setPrefWidth(primaryStage.getWidth());
 
             }
         });
@@ -334,9 +311,6 @@ public class NetfliksD implements Initializable {
         primaryStage.maximizedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 updateMovieLists();
-                scrollAnchorPane.setPrefHeight(primaryStage.getHeight()-navBar.getHeight());
-                vBoxSizeHelper.setPrefHeight(primaryStage.getHeight()-navBar.getHeight());
-                vBoxSizeHelper.setPrefWidth(primaryStage.getWidth());
             }
         });
     }
@@ -370,19 +344,12 @@ public class NetfliksD implements Initializable {
             gridPane.setHgap(5);
             gridPane.setVgap(0);
             gridPane.setPadding(new Insets(0, 0, 10, 5));
-            
-            if (row == ROWS-1) {
-                System.out.println("her er jeg");
-                gridPane.setPadding(new Insets(0, 0, 10+(MOVIE_IMG_HEIGHT/8), 5));
-            }
-
             gridPaneList.add(gridPane);
 
             // Create HBox to hold arrow buttons
             HBox arrowButtonsHBox = new HBox();
             arrowButtonsHBox.setAlignment(Pos.TOP_LEFT);
             VBox.setMargin(arrowButtonsHBox, new Insets(-MOVIE_IMG_HEIGHT - 5, 10, 0, 10));
-            //arrowButtonsHBox.setMouseTransparent(true);
 
             imageInMovieListCurrentLastIndex.put(row, 0);
             previousSpacerLockValue.add(row, 0.0);
@@ -413,12 +380,9 @@ public class NetfliksD implements Initializable {
             Label movieTabTitle = new Label(movieDisplayLabels.get(row));
             movieTabTitle.setId("movieTabTitle"); // To CSS
 
-            VBox.setMargin(gridPane, new Insets(0, 0, MOVIE_IMG_HEIGHT/2.4, 0));
+            VBox.setMargin(gridPane, new Insets(0, 0, MOVIE_IMG_HEIGHT/2.4+5, 0));
             movieDisplayHelper.setSpacing(MOVIE_IMG_HEIGHT/2.4);
 
-            // gridPane.setStyle("-fx-background-color: #35af0e");
-            // movieTabTitle.setStyle("-fx-background-color: #2a2323");
-            // arrowButtonsHBox.setStyle("-fx-background-color: #f30707");
 
 
             GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, arrowButtonsHBox);
@@ -451,13 +415,14 @@ public class NetfliksD implements Initializable {
                     ifBlockExecuted.set(false); // Reset the flag
                 }
 
-                spacer.setPrefWidth(lastColumnX-90+value);
+                spacer.setPrefWidth(lastColumnX-90+value-10); // They last -10 is because of scroll pane
                 arrowButtonsHBox.setMaxSize(lastColumnX+value,Region.USE_COMPUTED_SIZE);
                 gridPane.setMaxSize(lastColumnX,Region.USE_COMPUTED_SIZE);
                 });
             });
         }
 
+        VBox.setMargin(movieDisplayHelper, new Insets(0, 0, MOVIE_IMG_HEIGHT/2, 0));
         // Update the right arrow from start
         updateRightArrow();
     }

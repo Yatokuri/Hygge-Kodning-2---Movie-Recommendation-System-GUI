@@ -81,20 +81,23 @@
       </HBox>
       <VBox fx:id="mainDisplay" layoutX="-8.0" layoutY="59.0" stylesheets="@../CSS/Main.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="45.0">
          <children>
-            <ScrollPane fx:id="scrollPaneMovieDisplay" hmax="0.0" stylesheets="@../CSS/Main.css" VBox.vgrow="ALWAYS">
+            <ScrollPane fx:id="scrollPaneMovieDisplay" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" stylesheets="@../CSS/Main.css" VBox.vgrow="ALWAYS">
                <content>
-                  <AnchorPane fx:id="scrollAnchorPane" stylesheets="@../CSS/Main.css">
+                  <VBox fx:id="vBoxSizeHelper">
                      <children>
-                        <VBox fx:id="vBoxSizeHelper">
-                           <children>
-                              <VBox fx:id="movieDisplayHelper" />
-                              <VBox fx:id="movieDisplayList" />
-                              <VBox fx:id="movieDisplayDonate" />
-                           </children>
+                        <VBox fx:id="movieDisplayHelper" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
                         </VBox>
+                        <VBox fx:id="movieDisplayList" visible="false" VBox.vgrow="ALWAYS" />
+                        <VBox fx:id="movieDisplayDonate" visible="false" VBox.vgrow="ALWAYS" />
                      </children>
-                  </AnchorPane>
+                  </VBox>
                </content>
+               <VBox.margin>
+                  <Insets right="-2.0" />
+               </VBox.margin>
             </ScrollPane>
          </children>
       </VBox>
