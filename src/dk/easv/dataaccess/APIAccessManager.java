@@ -72,7 +72,7 @@ public class APIAccessManager  {
     private String cleanMovieTitle(String originalTitle) {
         // Remove specified suffix from the movie title
         String cleanedTitle = originalTitle.replace(": Collector's Edition: Bonus Material", "");
-        cleanedTitle = originalTitle.replace(": Special Edition: Bonus Material", "");
+        cleanedTitle = cleanedTitle.replace(": Special Edition: Bonus Material", "");
         cleanedTitle = cleanedTitle.replace("(Full-screen)", "");
         cleanedTitle = cleanedTitle.replace("(Stage Play)", "");
 

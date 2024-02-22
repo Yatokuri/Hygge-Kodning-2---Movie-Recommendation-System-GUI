@@ -2,6 +2,7 @@ package dk.easv.presentation.controller;
 
 import dk.easv.entities.Movie;
 import dk.easv.presentation.model.AppModel;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,18 +13,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.effect.BoxBlur;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -203,7 +201,7 @@ public class NetfliksD implements Initializable {
 
     private void loadMoreMovie(Integer movieRowIndex, Integer loadingStartIndex) {
 
-        System.out.println("Dit index: " + movieRowIndex + "Dit startindex" + loadingStartIndex);
+        //System.out.println("Dit index: " + movieRowIndex + "Dit startindex" + loadingStartIndex);
 
         List<Movie> selectedMovies;
             try {
@@ -258,15 +256,40 @@ public class NetfliksD implements Initializable {
 
     private void setupImageEventhandler(ImageView imageView, Movie m)   { // Add event handler when user interact with movie
         imageView.setOnMouseEntered(event -> {
-            System.out.println("Clicked on movie: " + m.getTitle());
-            imageView.setFitHeight(MOVIE_IMG_HEIGHT * 1.02);
-            imageView.setFitWidth(MOVIE_IMG_WIDTH * 1.02);
+            if (!isArrowButtonHovered) {
+                System.out.println("Clicked on movie: " + m.getTitle());
+                imageView.setFitHeight(MOVIE_IMG_HEIGHT * 1.02);
+                imageView.setFitWidth(MOVIE_IMG_WIDTH * 1.02);
+            }
         });
 
         imageView.setOnMouseExited(event -> {
-            System.out.println("Exited movie: " + m.getTitle());
-            imageView.setFitHeight(MOVIE_IMG_HEIGHT);
-            imageView.setFitWidth(MOVIE_IMG_WIDTH);
+            if (!isArrowButtonHovered) {
+                System.out.println("Exited movie: " + m.getTitle());
+                PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
+                pause.setOnFinished(e -> {
+                    if (!isArrowButtonHovered) {
+                        imageView.setFitHeight(MOVIE_IMG_HEIGHT);
+                        imageView.setFitWidth(MOVIE_IMG_WIDTH);
+                    }
+                });
+                pause.play();
+            }
+        });
+    }
+
+    private boolean isArrowButtonHovered = false; // Flag there get used to prevent flicking when using arrows
+    private void setupArrowButtonEventHandlers(Button arrowButton) {
+        arrowButton.setOnMouseEntered(event -> {
+            isArrowButtonHovered = true;
+        });
+
+        arrowButton.setOnMouseExited(event -> {
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.05));
+            pause.setOnFinished(e -> {
+                isArrowButtonHovered = false;
+            });
+            pause.play();
         });
     }
 
@@ -336,20 +359,15 @@ public class NetfliksD implements Initializable {
         }
     }
 
-    Button rightArrowButton, leftArrowButton;
 
     private void createImageGrid() {
+        Button rightArrowButton, leftArrowButton;
         for (int row = 0; row < ROWS; row++) {
             GridPane gridPane = new GridPane();
             gridPane.setHgap(5);
             gridPane.setVgap(0);
             gridPane.setPadding(new Insets(0, 0, 10, 5));
             gridPaneList.add(gridPane);
-
-            // Create HBox to hold arrow buttons
-            HBox arrowButtonsHBox = new HBox();
-            arrowButtonsHBox.setAlignment(Pos.TOP_LEFT);
-            VBox.setMargin(arrowButtonsHBox, new Insets(-MOVIE_IMG_HEIGHT - 5, 10, 0, 10));
 
             imageInMovieListCurrentLastIndex.put(row, 0);
             previousSpacerLockValue.add(row, 0.0);
@@ -372,20 +390,17 @@ public class NetfliksD implements Initializable {
             int finalRow1 = row;
             rightArrowButton.setOnAction(e -> handleRightArrow(gridPane, finalRow1));
 
-            Region spacer = new Region();
-            // Add arrows buttons to HBox
-            arrowButtonsHBox.getChildren().addAll(leftArrowButton, spacer, rightArrowButton);
-
             VBox GridPaneArrowTitleVBox = new VBox();
             Label movieTabTitle = new Label(movieDisplayLabels.get(row));
             movieTabTitle.setId("movieTabTitle"); // To CSS
+            movieDisplayHelper.setSpacing(-MOVIE_IMG_HEIGHT/3.7);
+            GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, leftArrowButton, rightArrowButton);
 
-            VBox.setMargin(gridPane, new Insets(0, 0, MOVIE_IMG_HEIGHT/2.4+5, 0));
-            movieDisplayHelper.setSpacing(MOVIE_IMG_HEIGHT/2.4);
-
-
-
-            GridPaneArrowTitleVBox.getChildren().addAll(movieTabTitle, gridPane, arrowButtonsHBox);
+            setupArrowButtonEventHandlers(leftArrowButton);
+            setupArrowButtonEventHandlers(rightArrowButton);
+            leftArrowButton.setTranslateY(-(MOVIE_IMG_HEIGHT/1.80)-5);
+            rightArrowButton.setTranslateY(-(MOVIE_IMG_HEIGHT/1.80)-25-5);
+            leftArrowButton.setTranslateX(10); // Set the button position
             movieDisplayHelper.getChildren().add(GridPaneArrowTitleVBox);
 
             previousSpacerValue.add(row, 0.0);
@@ -393,6 +408,7 @@ public class NetfliksD implements Initializable {
             AtomicBoolean ifBlockExecuted = new AtomicBoolean(true); // Flag to track if the condition block has been executed
 
             // Listener to print the gridPanes last column x-coordinate and window size
+            Button finalRightArrowButton = rightArrowButton;
             primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> {
                 Platform.runLater(() -> {
 
@@ -410,19 +426,18 @@ public class NetfliksD implements Initializable {
                     previousSpacerValue.set(gridPaneList.indexOf(gridPane), value);
                     ifBlockExecuted.set(true); // Update the flag
                 } else if (ifBlockExecuted.get()) { // Check if the condition block has been executed before
-                    value = (previousSpacerValue.get(gridPaneList.indexOf(gridPane))+(5));
+                    value = (previousSpacerValue.get(gridPaneList.indexOf(gridPane))+(15));
                     previousSpacerValue.set(gridPaneList.indexOf(gridPane), value);
                     ifBlockExecuted.set(false); // Reset the flag
                 }
 
-                spacer.setPrefWidth(lastColumnX-90+value-10); // They last -10 is because of scroll pane
-                arrowButtonsHBox.setMaxSize(lastColumnX+value,Region.USE_COMPUTED_SIZE);
-                gridPane.setMaxSize(lastColumnX,Region.USE_COMPUTED_SIZE);
+                finalRightArrowButton.setTranslateX(lastColumnX - 55 + value - 10); // They last -10 is because of scroll pane
+                finalRightArrowButton.getParent().layout();
                 });
             });
         }
 
-        VBox.setMargin(movieDisplayHelper, new Insets(0, 0, MOVIE_IMG_HEIGHT/2, 0));
+        VBox.setMargin(movieDisplayHelper, new Insets(0, 0, -45, 0));
         // Update the right arrow from start
         updateRightArrow();
     }

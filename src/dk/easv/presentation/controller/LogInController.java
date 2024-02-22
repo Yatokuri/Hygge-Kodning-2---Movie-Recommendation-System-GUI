@@ -125,14 +125,14 @@ public class LogInController implements Initializable {
 
     @FXML
     private void togglePassword() {
-        if (togglePasswordImg.getImage() == EyeOnIcon) {
-            togglePasswordImg.setImage(EyeOffIcon);
+        if (togglePasswordImg.getImage() == EyeOffIcon) {
+            togglePasswordImg.setImage(EyeOnIcon);
             passwordField.setVisible(false);
             passwordFieldPlain.setText(passwordField.getText());
             passwordFieldPlain.setVisible(true);
 
         } else {
-            togglePasswordImg.setImage(EyeOnIcon);
+            togglePasswordImg.setImage(EyeOffIcon);
             passwordField.setVisible(true);
             passwordField.setText(passwordFieldPlain.getText());
             passwordFieldPlain.setVisible(false);
